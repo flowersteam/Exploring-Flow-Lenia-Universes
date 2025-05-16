@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curiosity-driven exploration of Flow Lenia universes: Bootstrapping open-ended evolution</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+    <style>
+        :root {
+            --primary-color: #3a7ca5;
+            --secondary-color: #2f6690;
+            --accent-color: #d9dcd6;
+            --text-color: #333;
+            --light-text: #666;
+            --background: #f9f9f9;
+            --card-bg: #fff;
+            --section-spacing: 2.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background);
+            padding: 0;
+            max-width: 100%;
+            overflow-x: hidden;
+            text-align: justify;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            position: relative;
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: var(--section-spacing);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #333;
+            /* Fallback in case image doesn't load */
+        }
+
+        /* Background image with overlay */
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('long.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        /* Dark gradient overlay for better text readability */
+        header::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(47, 102, 144, 0.85), rgba(0, 0, 0, 0.7));
+            z-index: 1;
+        }
+
+        header .container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+            /* Place content above the background image */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+        }
+
+        .author-placeholder {
+            font-style: italic;
+            color: #eee;
+            margin-bottom: 1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .author-placeholder a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .author-placeholder a:hover {
+            text-decoration: underline;
+            color: var(--accent-color);
+        }
+
+        .author-placeholder a .external-link-icon {
+            width: 0.8em;
+            height: 0.8em;
+            margin-left: 0.25em;
+            vertical-align: -0.05em;
+            fill: currentColor;
+        }
+
+        .paper-info {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-item svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        section {
+            margin-bottom: var(--section-spacing);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .img-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .img-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s;
+        }
+
+        .img-container:hover img {
+            transform: scale(1.03);
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 100%;
+            /* 1:1 aspect ratio (square) */
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            background-color: #eee;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .video-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: contain;
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            color: #555;
+            font-style: italic;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .video-container:hover .video-placeholder {
+            background-color: #e8e8e8;
+        }
+
+        .tool-preview {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .tool-preview:hover {
+            border-color: var(--primary-color);
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .key-points {
+            list-style-type: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .key-points li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .key-points li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 0;
+        }
+
+        .abstract {
+            font-style: italic;
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            background-color: rgba(58, 124, 165, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-highlight {
+            background: linear-gradient(135deg, rgba(58, 124, 165, 0.1), rgba(47, 102, 144, 0.1));
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 1rem 0 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .tool-highlight-content {
+            flex: 1;
+        }
+
+        .highlight-box {
+            background-color: rgba(58, 124, 165, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-top: 3px solid var(--primary-color);
+        }
+
+        .highlight-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1 style="text-align: center;">Exploring Flow-Lenia Universes with a Curiosity-driven AI Scientist: Discovering Diverse Ecosystem Dynamics</h1>
+            <div class="author-placeholder">
+                <a href="https://thomick.github.io" target="_blank">Thomas Michel<svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 12v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></a>,
+                Marko Cvjetko,
+                <a href="https://reytuag.github.io/gautier-hamon/" target="_blank">Gautier Hamon<svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 12v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></a>,
+                <a href="http://www.pyoudeyer.com/" target="_blank">Pierre-Yves Oudeyer<svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 12v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></a>,
+                <a href="https://clement-moulin-frier.github.io/" target="_blank">Clément Moulin-Frier<svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 12v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></a>
+                <br>
+                <span style="font-size: 0.9em; color: #ddd;">Centre Inria de l'Université de Bordeaux</span>
+            </div>
+            <div class="paper-info">
+                <!-- <div class="info-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    <span>ALife Conference 2025</span>
+                </div> -->
+                <div class="info-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                    <span>Paper link</span>
+                </div>
+            </div>
+            <div>
+                <span class="tag">Open-Ended Evolution</span>
+                <span class="tag">Cellular Automata</span>
+                <span class="tag">Flow-Lenia</span>
+                <span class="tag">IMGEP</span>
+                <span class="tag">Artificial Life</span>
+            </div>
+
+            <a href="visualization/index.html" class="btn">Access the Visualization Tool</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section>
+            <div class="card">
+                <h2>Overview</h2>
+
+                <div class="abstract">
+                    <p>    We present a method for automated discovery of system-level dynamics in Flow Lenia—a continuous cellular automaton with mass conservation and parameter localization—using an AI scientist system  based on Intrinsically Motivated Goal Exploration Processes (IMGEP). Exploring full ecosystemic simulations is crucial for understanding the emergence of complex collective behaviors that individual pattern analysis cannot capture, such as competition, cooperation, and environmental adaptation. While previous applications of IMGEPs, a family of diversity search algorithms, focused on automated exploration of self-organized individual patterns or behavior, we extend this methodology to explore system-level dynamics. Our implementation evaluates systems using simulation-wide metrics (e.g. evolutionary activity, compression-based complexity, and multi-scale entropy) to guide exploration toward diverse evolutionary regimes. Results show IMGEPs discover significantly more diverse dynamics than random search, revealing complex self-organized ecological interactions in Flow Lenia. We complement automated discovery with an interactive exploration tool, creating an effective human-AI collaborative workflow for scientific investigation. Though demonstrated specifically with Flow Lenia, this methodology provides a framework potentially applicable to other parameterizable complex systems where understanding emergent collective properties is of interest. 
+                    </p>
+                </div>
+
+                <h3>Key Contributions</h3>
+                <ul class="key-points">
+                    <li>Extension of IMGEP as a systematic discovery tool for ecosystem-level emergent properties in
+                        complex systems, applied here to uncover diverse evolutionary dynamics in Flow-Lenia</li>
+                    <li>Multi-metric approach to evaluating evolutionary dynamics, combining evolutionary activity,
+                        complexity measures, and multi-scale entropy analysis</li>
+                    <li>Discovery of diverse evolutionary phenomena suggesting ecological interactions</li>
+                </ul>
+
+                <div class="tool-highlight">
+                    <div class="tool-highlight-content">
+                        <h3 style="margin-top: 0;">Interactive Visualization Tool</h3>
+                        <p>Explore Flow-Lenia's evolutionary dynamics with our interactive tool. Examine parameter
+                            configurations, emergent behaviors, and evolutionary metrics discovered by IMGEP.</p>
+                        <a href="visualization/index.html" class="btn">Launch Visualization Tool</a>
+                    </div>
+                    <div style="flex-shrink: 0;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M21 3H3C1.89543 3 1 3.89543 1 5V19C1 20.1046 1.89543 21 3 21H21C22.1046 21 23 20.1046 23 19V5C23 3.89543 22.1046 3 21 3Z"
+                                stroke="#3a7ca5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M9 3V21" stroke="#3a7ca5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M14 8H18" stroke="#3a7ca5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M14 12H18" stroke="#3a7ca5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M14 16H18" stroke="#3a7ca5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M4 8H5" stroke="#3a7ca5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M4 12H5" stroke="#3a7ca5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M4 16H5" stroke="#3a7ca5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Video Demonstrations</h2>
+            <p>These videos showcase the some interesting evolutionary dynamics discovered through our IMGEP
+                exploration:</p>
+
+            <div class="video-grid">
+                <div class="video-container">
+                    <video controls autoplay loop muted>
+                        <source src="visualization/673/videos/video_both.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls autoplay loop muted>
+                        <source src="visualization/1691/videos/video_both.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls autoplay loop muted>
+                        <source src="visualization/204/videos/video_both.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls autoplay loop muted>
+                        <source src="visualization/1204/videos/video_both.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls autoplay loop muted>
+                        <source src="visualization/2324/videos/video_both.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls autoplay loop muted>
+                        <source src="visualization/949/videos/video_both.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Want to discuss or have any questions? Feel free to reach out to <a href="https://thomick.github.io" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: underline;">Thomas Michel</a>.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

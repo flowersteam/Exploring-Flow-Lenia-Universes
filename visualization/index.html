@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowlenia Visualization</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a1a, #2c2c2c, #1a1a1a);
+            font-family: sans-serif;
+            color: #fff;
+        }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #zoomContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+        }
+
+        #axesContainer {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            width: calc(100% - 100px);
+            height: calc(100% - 100px);
+            pointer-events: none;
+            z-index: 500;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            border-left: 1px solid rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            box-sizing: border-box;
+            display: none;
+            /* Hidden by default */
+        }
+
+        #xAxisLabel,
+        #yAxisLabel {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        #xAxisLabel {
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #yAxisLabel {
+            left: -55px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            transform-origin: left top;
+        }
+
+
+        #selectedEntries,
+        #controlsMenu {
+            position: fixed;
+            background: rgba(30, 30, 30, 0.8);
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #selectedEntries {
+            top: 10px;
+            left: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        #selectedEntries h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 5px;
+        }
+
+        #selectedEntries ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #selectedEntries li {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+        }
+
+        /* New styles for the cross button */
+        .remove-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background: rgba(255, 50, 50, 0.2);
+            border: 1px solid rgba(255, 50, 50, 0.5);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(255, 50, 50, 0.4);
+            color: white;
+        }
+
+        .export-item-name {
+            flex-grow: 1;
+        }
+
+        #controlsMenu {
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            /* Increased gap */
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 3px;
+        }
+
+        /* Slider Styles */
+        #displayCountSlider {
+            width: 100%;
+        }
+
+        #displayCountLabel {
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        #controlsToggle {
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        #controlsToggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #controlsContent {
+            display: none;
+            padding-left: 10px;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #controlsContent ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #controlsContent li {
+            margin-bottom: 5px;
+        }
+
+        .discovery-item {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: width 0.2s, height 0.2s, top 0.3s ease-out, left 0.3s ease-out;
+            /* Added smooth position transition */
+        }
+
+        .discovery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5%;
+            outline: thin solid rgba(255, 255, 255, 0.5);
+            display: block;
+            background-color: rgba(240, 240, 240, 0.05);
+        }
+
+        .placeholder {
+        }
+
+        #videoOverlay {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(30, 30, 30, 0.85);
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1001;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            max-width: 500px;
+        }
+
+        /* Video Title */
+        #videoTitle {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 5px;
+        }
+
+        #videoOverlay video {
+            max-width: 100%;
+            border-radius: 5px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #goalDataContainer {
+            margin-top: 10px;
+        }
+
+        /* Button Styles */
+        button {
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.2s, transform 0.1s;
+            border: none;
+            color: #fff;
+            font-size: 0.9em;
+            margin-top: 8px;
+            outline: none;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Special styling for the "Remove from Export" state */
+        #addToExportButton.remove {
+            background: rgba(255, 50, 50, 0.2);
+            border: 1px solid rgba(255, 50, 50, 0.3);
+        }
+
+        #addToExportButton.remove:hover {
+            background: rgba(255, 50, 50, 0.3);
+        }
+
+        /* Export button at the bottom of the selection list */
+        #selectedEntries button {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        #imageSizeSlider {
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="axesContainer">
+            <div id="xAxisLabel"></div>
+            <div id="yAxisLabel"></div>
+        </div>
+        <div id="zoomContainer"></div>
+
+        <div id="selectedEntries">
+            <h3>Selected for Export:</h3>
+            <ul id="exportList"></ul>
+            <button onclick="exportSelected()">Export Selected Videos</button>
+        </div>
+
+        <div id="controlsMenu">
+            <div class="control-group">
+                <label for="viewSelect">Select View:</label>
+                <select id="viewSelect" onchange="changeView()"></select>
+            </div>
+
+            <div class="control-group">
+                <label for="imageSizeSlider">Image size:</label>
+                <input type="range" id="imageSizeSlider" min="10" max="200" value="50">
+            </div>
+
+            <div class="control-group">
+                <label for="displayCountSlider" id="displayCountLabel">Trials Displayed: 100</label>
+                <input type="range" id="displayCountSlider" min="10" max="100" value="100"
+                    oninput="handleDisplayCountChange(this.value)" onchange="handleDisplayCountChange(this.value)">
+            </div>
+
+            <div id="controlsToggle" onclick="toggleControls()">Controls ▼</div>
+            <div id="controlsContent">
+                <ul>
+                    <li><strong>Click:</strong> Play video</li>
+                    <li><strong>Scroll:</strong> Zoom in/out</li>
+                    <li><strong>Drag:</strong> Pan the view</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="videoOverlay">
+            <div id="videoTitle">Trial: ---</div> <video loop muted controls></video>
+            <button id="addToExportButton" onclick="toggleExportSelection()">Add to Export</button>
+            <div id="goalDataContainer">
+                <button id="toggleGoalButton" onclick="toggleGoalData()">Show Goal Data</button>
+                <div id="goalDataDisplay"></div>
+            </div>
+        </div>
+
+        <script>
+            // --- Global Variables ---
+            let selectedEntries = new Set();
+            let scale = 1, translateX = 0, translateY = 0;
+            let isDragging = false, startX, startY;
+            let currentVideoIndex = null, currentGoalData = null;
+            let imageSize = 50;
+
+            let allDiscoveriesInView = []; // Holds coordinate data for the *selected* view
+            let viewOrderIndices = []; // Holds *all* indices for the current view, shuffled once
+            let displayedIndices = new Set(); // Indices currently shown in the DOM
+            let targetDisplayCount = 100; // Target number based on slider
+
+            let fullData = null; // Holds ALL coordinate data from discoveries.json
+            let availableViews = [];
+
+            const BATCH_ADD_SIZE = 50; // How many to add/remove at a time for smoothness with slider
+
+            // --- Data Loading and View Management ---
+
+            async function loadAvailableViews() {
+                try {
+                    const viewsResponse = await fetch('views.json');
+                    if (!viewsResponse.ok) throw new Error(`HTTP error loading views.json! status: ${viewsResponse.status}`);
+                    const viewsData = await viewsResponse.json();
+                    if (!viewsData || !viewsData.views) throw new Error("views.json is missing 'views' array.");
+                    availableViews = viewsData.views;
+
+                    const dataResponse = await fetch('discoveries.json');
+                    if (!dataResponse.ok) throw new Error(`HTTP error loading discoveries.json! status: ${dataResponse.status}`);
+                    fullData = await dataResponse.json(); // Store the entire dataset
+
+                    const viewSelect = document.getElementById('viewSelect');
+                    viewSelect.innerHTML = '';
+                    availableViews.forEach(view => {
+                        const option = document.createElement('option');
+                        option.value = view; option.textContent = view;
+                        viewSelect.appendChild(option);
+                    });
+                    changeView(); // Load initial view
+                } catch (error) {
+                    console.error("Failed to load view data:", error);
+                    alert(`Error loading view data: ${error.message}.`);
+                }
+            }
+
+            function changeView() {
+                const selectedView = document.getElementById('viewSelect').value;
+                if (!fullData || !fullData[selectedView]) {
+                    console.error(`Data for view '${selectedView}' not found.`);
+                    alert(`Error: Data for view '${selectedView}' not found.`);
+                    return;
+                }
+
+                allDiscoveriesInView = fullData[selectedView]; // Data for the current view
+                viewOrderIndices = Array.from(allDiscoveriesInView.keys()); // Get all possible indices (0, 1, 2...)
+                shuffleArray(viewOrderIndices); // Shuffle them once for this view load
+
+                // Reset scale/pan
+                scale = 1; translateX = 0; translateY = 0;
+                updateTransform();
+
+                // Update Slider
+                const slider = document.getElementById('displayCountSlider');
+                const totalInView = allDiscoveriesInView.length;
+                slider.max = totalInView > 0 ? totalInView : 10; // Avoid max=0
+                const initialCount = Math.min(targetDisplayCount, totalInView); // Keep target or max available
+                slider.value = initialCount;
+                targetDisplayCount = initialCount; // Update target if it was capped by total
+                updateDisplayCountLabel();
+
+
+                // Update Axes
+                drawAxes(selectedView);
+
+                // Update displayed items
+                updateDisplayedItems(); // This now handles adding/removing/updating positions
+            }
+
+
+            // --- Item Display Management (Slider Logic) ---
+
+            function updateDisplayedItems() {
+                console.log(`Updating display. Target: ${targetDisplayCount}`);
+                const container = document.getElementById('zoomContainer');
+                const itemsInDom = container.querySelectorAll('.discovery-item');
+                const currentDomIndices = new Set(Array.from(itemsInDom).map(item => parseInt(item.dataset.originalIndex)));
+
+                // Map indices to their data for the CURRENT view
+                const newViewDataMap = new Map();
+                allDiscoveriesInView.forEach((discovery, index) => {
+                    // Add trialID here for easier access later
+                    const visualPath = discovery.visual;
+                    const trialID = visualPath ? visualPath.split('/')[0] : index.toString(); // Derive trial ID
+                    newViewDataMap.set(index, { ...discovery, trialID: trialID, originalIndex: index }); // Ensure originalIndex is part of the object
+                });
+
+
+                let itemsToRemove = [];
+                let itemsToUpdate = [];
+                let currentDisplayedIndices = new Set(); // Track indices that will remain or be updated
+
+                // 1. Update positions of existing items / Mark for removal
+                itemsInDom.forEach(itemElement => {
+                    const index = parseInt(itemElement.dataset.originalIndex);
+                    if (newViewDataMap.has(index)) {
+                        // Item exists in the new view, update its position
+                        const discoveryData = newViewDataMap.get(index);
+                        itemElement.style.left = `${(discoveryData.x + 0.5) * 100}%`;
+                        itemElement.style.top = `${(0.5 - discoveryData.y) * 100}%`;
+                        itemsToUpdate.push(index); // Keep track
+                        currentDisplayedIndices.add(index);
+                    } else {
+                        // Item does NOT exist in the new view, mark for removal
+                        itemsToRemove.push(itemElement);
+                    }
+                });
+
+                // Remove items not present in the new view
+                console.log(`Removing ${itemsToRemove.length} items not in the new view.`);
+                itemsToRemove.forEach(item => item.remove());
+
+
+                // 2. Determine how many to add or remove based on the slider target
+                const currentCount = currentDisplayedIndices.size;
+                const difference = targetDisplayCount - currentCount;
+
+                if (difference > 0) {
+                    // Add items
+                    console.log(`Need to add ${difference} items.`);
+                    const indicesToAdd = [];
+                    let added = 0;
+                    for (const index of viewOrderIndices) { // Iterate through the shuffled list for this view
+                        if (added >= difference) break; // Stop when we have enough
+                        if (!currentDisplayedIndices.has(index)) { // Add only if not already displayed
+                            indicesToAdd.push(index);
+                            added++;
+                        }
+                    }
+                    if (indicesToAdd.length > 0) {
+                        renderDiscoveriesBatch(indicesToAdd.map(idx => newViewDataMap.get(idx))); // Render new items
+                        indicesToAdd.forEach(idx => currentDisplayedIndices.add(idx)); // Add to our set
+                    }
+
+                } else if (difference < 0) {
+                    // Remove items
+                    const countToRemove = -difference;
+                    console.log(`Need to remove ${countToRemove} items.`);
+                    const indicesToRemove = [];
+                    // Convert Set to array to easily select items to remove (e.g., last ones added implicitly by Set iteration order, though not guaranteed)
+                    const displayedArray = Array.from(currentDisplayedIndices);
+                    for (let i = 0; i < countToRemove && displayedArray.length > 0; i++) {
+                        // Remove from the end of the array (simplest strategy)
+                        const indexToRemove = displayedArray.pop();
+                        indicesToRemove.push(indexToRemove);
+                    }
+
+                    // Remove corresponding DOM elements
+                    indicesToRemove.forEach(index => {
+                        const itemElement = container.querySelector(`.discovery-item[data-original-index="${index}"]`);
+                        if (itemElement) itemElement.remove();
+                        currentDisplayedIndices.delete(index); // Remove from our set
+                    });
+                }
+
+                // Update the global set of displayed indices
+                displayedIndices = currentDisplayedIndices;
+                updateDisplayCountLabel(); // Update label based on final count
+            }
+
+
+            function handleDisplayCountChange(value) {
+                targetDisplayCount = parseInt(value);
+                updateDisplayCountLabel();
+                updateDisplayedItems(); // Trigger add/remove logic
+            }
+
+            function updateDisplayCountLabel() {
+                const label = document.getElementById('displayCountLabel');
+                const totalInView = allDiscoveriesInView.length;
+                // Display the slider's target value, and the total for the view
+                label.textContent = `Trials Displayed: ${targetDisplayCount} / ${totalInView}`;
+            }
+
+
+            // --- Rendering Batch ---
+            function renderDiscoveriesBatch(discoveriesToRender) {
+                const container = document.getElementById('zoomContainer');
+                console.log(`Rendering batch of ${discoveriesToRender.length} discoveries.`);
+
+                discoveriesToRender.forEach(discovery => {
+                    const originalIndex = discovery.originalIndex; // Use index passed in discovery object
+
+                    // Double check validity
+                    if (discovery === null || typeof discovery.x !== 'number' || typeof discovery.y !== 'number' || typeof discovery.visual !== 'string') {
+                        console.warn(`[Render Batch] Invalid data for index ${originalIndex}:`, discovery);
+                        return;
+                    }
+                    // Avoid re-rendering if somehow it exists (shouldn't happen with new logic)
+                    if (container.querySelector(`.discovery-item[data-original-index="${originalIndex}"]`)) {
+                        return;
+                    }
+
+                    const item = document.createElement('div');
+                    item.className = 'discovery-item';
+                    item.style.left = `${(discovery.x + 0.5) * 100}%`;
+                    item.style.top = `${(0.5 - discovery.y) * 100}%`;
+                    item.style.width = `${imageSize}px`;
+                    item.style.height = `${imageSize}px`;
+                    item.dataset.originalIndex = originalIndex;
+
+                    const img = new Image();
+                    const pngPath = discovery.visual.replace(/\.[^/.]+$/, ".png");
+                    img.alt = `Discovery index ${originalIndex}`;
+                    img.src = pngPath;
+
+                    img.onload = () => item.appendChild(img);
+                    img.onerror = () => {
+                        console.warn(`[Render Batch] Failed image load for ${img.src}, removing item.`);
+                        item.remove(); // Remove the item from the DOM
+                    };
+
+                    item.addEventListener('click', handleItemClick);
+
+                    container.appendChild(item);
+                });
+            }
+
+
+            // --- Axes Drawing ---
+            function drawAxes(viewName) {
+                const axesContainer = document.getElementById('axesContainer');
+                const xLabel = document.getElementById('xAxisLabel');
+                const yLabel = document.getElementById('yAxisLabel');
+                if (viewName && viewName.toLowerCase() !== 'umap' && viewName.includes('_vs_')) {
+                    const parts = viewName.split('_vs_');
+                    xLabel.textContent = parts[0]; yLabel.textContent = parts[1];
+                    axesContainer.style.display = 'block';
+                } else {
+                    axesContainer.style.display = 'none';
+                    xLabel.textContent = ''; yLabel.textContent = '';
+                }
+            }
+
+
+            // --- User Interactions (Pan/Zoom, Size, Toggle) ---
+            function handleItemClick(e) {
+                e.stopPropagation(); const idx = parseInt(e.currentTarget.dataset.originalIndex); loadAndPlayVideo(idx);
+            }
+            document.getElementById('container').addEventListener('wheel', (e) => {
+                e.preventDefault(); const zoomSpeed = 0.1; const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed;
+                const newScale = Math.max(0.05, Math.min(scale * (1 + delta), 20)); const containerRect = document.getElementById('container').getBoundingClientRect();
+                const mouseX = e.clientX - containerRect.left; const mouseY = e.clientY - containerRect.top;
+                translateX = mouseX - (mouseX - translateX) * (newScale / scale); translateY = mouseY - (mouseY - translateY) * (newScale / scale);
+                scale = newScale; updateTransform();
+            });
+            document.getElementById('container').addEventListener('mousedown', (e) => {
+                if (e.target === document.getElementById('container') || e.target === document.getElementById('zoomContainer')) {
+                    isDragging = true; startX = e.clientX - translateX; startY = e.clientY - translateY;
+                    document.getElementById('container').style.cursor = 'grabbing';
+                }
+            });
+            document.addEventListener('mousemove', (e) => { if (isDragging) { translateX = e.clientX - startX; translateY = e.clientY - startY; updateTransform(); } });
+            document.addEventListener('mouseup', () => { if (isDragging) { isDragging = false; document.getElementById('container').style.cursor = 'grab'; } });
+            document.getElementById('imageSizeSlider').addEventListener('input', (e) => {
+                imageSize = parseInt(e.target.value); const items = document.querySelectorAll('.discovery-item');
+                items.forEach(item => { item.style.width = `${imageSize}px`; item.style.height = `${imageSize}px`; });
+            });
+            function toggleControls() {
+                const content = document.getElementById('controlsContent'); const toggle = document.getElementById('controlsToggle');
+                if (content.style.display === 'none' || content.style.display === '') { content.style.display = 'block'; toggle.textContent = 'Controls ▲'; }
+                else { content.style.display = 'none'; toggle.textContent = 'Controls ▼'; }
+            }
+            function updateTransform() { const zoomContainer = document.getElementById('zoomContainer'); zoomContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; }
+
+            // --- Video Playback and Goal Data ---
+
+            async function loadAndPlayVideo(originalIndex) {
+                // Validate index
+                if (typeof originalIndex !== 'number' || !Number.isInteger(originalIndex) || !allDiscoveriesInView[originalIndex]) {
+                    console.error("[Video] Invalid or missing index:", originalIndex); return;
+                }
+                const discovery = allDiscoveriesInView[originalIndex];
+                const visualPath = discovery.visual;
+                if (!visualPath) { console.error("[Video] Missing visual path for index:", originalIndex); return; }
+
+                // Derive Trial ID
+                const trialID = visualPath.split('/')[0] || `Index ${originalIndex}`; // Fallback
+
+                const videoOverlay = document.getElementById('videoOverlay');
+                const videoElement = videoOverlay.querySelector('video');
+                const videoTitle = document.getElementById('videoTitle'); // Get title element
+
+                currentVideoIndex = originalIndex;
+                currentGoalData = null;
+                hideGoalData();
+
+                // Update Title
+                videoTitle.textContent = `Trial: ${trialID}`;
+
+                videoElement.src = visualPath;
+                try {
+                    await videoElement.play();
+                    videoOverlay.style.display = 'block';
+                    fetchGoalData(originalIndex); // Fetch goals
+                } catch (e) {
+                    console.error(`[Video] Error playing ${visualPath}:`, e);
+                    videoOverlay.style.display = 'none';
+                }
+                updateExportButtonState();
+            }
+
+            async function fetchGoalData(originalIndex) {
+                if (currentVideoIndex !== originalIndex) return;
+                const discovery = allDiscoveriesInView[originalIndex]; if (!discovery || !discovery.visual) return;
+                const visualPath = discovery.visual; const pathParts = visualPath.split('/');
+                if (pathParts.length < 2) { console.error("[Goal Data] Cannot determine base directory from visual path:", visualPath); return; }
+                const baseDir = pathParts[0]; const goalPath = `${baseDir}/reached_goal.json`;
+                console.log("[Goal Data] Attempting to fetch:", goalPath);
+                try {
+                    const response = await fetch(goalPath); if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                    currentGoalData = await response.json(); console.log("[Goal Data] Fetched successfully:", currentGoalData);
+                } catch (error) { console.error("[Goal Data] Failed to fetch or parse", goalPath, error); currentGoalData = { error: `Failed to load: ${error.message}` }; }
+            }
+            function toggleGoalData() {
+                const displayDiv = document.getElementById('goalDataDisplay'); const button = document.getElementById('toggleGoalButton');
+                if (displayDiv.style.display === 'none') { showGoalData(); button.textContent = 'Hide Goal Data'; }
+                else { hideGoalData(); button.textContent = 'Show Goal Data'; }
+            }
+            function showGoalData() {
+                const displayDiv = document.getElementById('goalDataDisplay');
+                if (currentGoalData) { displayDiv.textContent = JSON.stringify(currentGoalData, null, 2); displayDiv.style.display = 'block'; }
+                else { displayDiv.textContent = 'No goal data loaded or available.'; displayDiv.style.display = 'block'; }
+                document.getElementById('toggleGoalButton').textContent = 'Hide Goal Data';
+            }
+            function hideGoalData() {
+                const displayDiv = document.getElementById('goalDataDisplay'); displayDiv.style.display = 'none'; displayDiv.textContent = '';
+                document.getElementById('toggleGoalButton').textContent = 'Show Goal Data';
+            }
+
+            // --- Export Logic ---
+
+            // New function to remove an item from export list directly
+            function removeFromExport(index) {
+                if (!selectedEntries.has(index)) return;
+
+                selectedEntries.delete(index);
+                const exportList = document.getElementById('exportList');
+                const itemToRemove = exportList.querySelector(`li[data-index='${index}']`);
+                if (itemToRemove) itemToRemove.remove();
+
+                // Update button state if this is the current video
+                if (currentVideoIndex === index) {
+                    updateExportButtonState();
+                }
+            }
+
+            function toggleExportSelection() {
+                if (currentVideoIndex === null || !allDiscoveriesInView[currentVideoIndex]) return;
+
+                const exportList = document.getElementById('exportList');
+                const visualPath = allDiscoveriesInView[currentVideoIndex].visual;
+                const trialID = visualPath ? visualPath.split('/')[0] : currentVideoIndex.toString();
+                const displayName = `trial_${trialID}.mp4`; // Use name for display
+
+                if (selectedEntries.has(currentVideoIndex)) {
+                    removeFromExport(currentVideoIndex);
+                } else {
+                    selectedEntries.add(currentVideoIndex);
+                    const li = document.createElement('li');
+                    li.dataset.index = currentVideoIndex;
+
+                    // Create remove button with cross symbol
+                    const removeBtn = document.createElement('div');
+                    removeBtn.className = 'remove-btn';
+                    removeBtn.innerHTML = '✕';
+                    removeBtn.onclick = function (e) {
+                        e.stopPropagation(); // Prevent bubbling
+                        removeFromExport(currentVideoIndex);
+                    };
+
+                    // Create span for the name
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'export-item-name';
+                    nameSpan.textContent = displayName;
+
+                    // Add components to the list item
+                    li.appendChild(removeBtn);
+                    li.appendChild(nameSpan);
+
+                    exportList.appendChild(li);
+                }
+                updateExportButtonState();
+            }
+
+            function updateExportButtonState() {
+                const exportButton = document.getElementById('addToExportButton');
+                if (currentVideoIndex !== null && selectedEntries.has(currentVideoIndex)) {
+                    exportButton.textContent = "Remove from Export";
+                    exportButton.classList.add('remove');
+                }
+                else {
+                    exportButton.textContent = "Add to Export";
+                    exportButton.classList.remove('remove');
+                }
+            }
+
+            async function exportSelected() {
+                if (selectedEntries.size === 0) {
+                    alert("No entries selected for export.");
+                    return;
+                }
+
+                const indicesToExport = Array.from(selectedEntries);
+                console.log("[Export] Exporting indices:", indicesToExport);
+
+                for (const index of indicesToExport) {
+                    if (index === null || !allDiscoveriesInView[index]) {
+                        console.warn("[Export] Skipping invalid index:", index);
+                        continue;
+                    }
+
+                    const discovery = allDiscoveriesInView[index];
+                    const visualPath = discovery.visual;
+
+                    if (!visualPath) {
+                        console.warn(`[Export] Skipping index ${index}: missing visual path.`);
+                        continue;
+                    }
+
+                    const trialID = visualPath.split('/')[0];
+                    if (!trialID) {
+                        console.warn(`[Export] Skipping index ${index}: Could not derive trial ID from path ${visualPath}`);
+                        continue;
+                    }
+
+                    const newFilename = `trial_${trialID}.mp4`;
+                    const videoUrl = visualPath;
+
+                    console.log(`[Export] Preparing download: ${newFilename} from ${videoUrl}`);
+
+                    try {
+                        const response = await fetch(videoUrl);
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
+                        }
+
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = newFilename;
+                        document.body.appendChild(a);
+                        a.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        console.log(`[Export] Download initiated for ${newFilename}`);
+
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    } catch (error) {
+                        console.error(`[Export] Error downloading index ${index} (${newFilename}):`, error);
+                        alert(`Failed to download video for trial ${trialID}. Check console.`);
+                    }
+                }
+                console.log("[Export] Finished processing selected items.");
+            }
+
+
+            // --- Initial Setup ---
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('container').style.cursor = 'grab';
+                loadAvailableViews(); // Start loading
+            });
+
+            // Helper Function to shuffle array (Fisher-Yates)
+            function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; } }
+
+        </script>
+    </div>
+
+    <style>
+        #helpButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            /* Lighter, more visible background */
+            border: 1px solid rgba(100, 100, 150, 0.5);
+            /* Add border for definition */
+            color: #fff;
+            padding: 10px 20px 10px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+
+        }
+
+        #helpButton .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #4b70e2;
+            /* Blue circle */
+            color: white;
+            width: 28px;
+            height: 28px;
+            font-size: 18px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        #helpButton:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #helpPanel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            background: rgba(30, 30, 30, 0.8);
+            color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1200;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        #helpPanel h2 {
+            margin-top: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .help-section {
+            margin-bottom: 20px;
+        }
+
+        .help-section h3 {
+            margin-bottom: 5px;
+            color: #4b70e2;
+        }
+
+        #closeHelp {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+
+    <button id="helpButton" title="How to use this tool">
+        <div class="icon">?</div>
+        <span>How to use?</span>
+    </button>
+
+    <div id="helpPanel">
+        <button id="closeHelp">✕</button>
+        <h2>How to Use This Tool</h2>
+
+        <div class="help-section">
+            <h3>Moving Around</h3>
+            <p>• <strong>Move the view:</strong> Click and drag on empty space<br>
+                • <strong>Zoom in/out:</strong> Scroll with your mouse<br>
+                • <strong>Watch a video:</strong> Click on any image</p>
+        </div>
+
+        <div class="help-section">
+            <h3>Control Panel (Top Right)</h3>
+            <p>• <strong>Select View:</strong> Choose different ways to see the data<br>
+                • <strong>Image Size:</strong> Make thumbnails bigger or smaller<br>
+                • <strong>Trials Displayed:</strong> Choose how many trials to show</p>
+        </div>
+
+        <div class="help-section">
+            <h3>Watching Videos</h3>
+            <p>• Click any thumbnail to play its video<br>
+                • The video will appear at the bottom left<br>
+                • Click "Show Goal Data" to see extra information<br>
+                • Click "Add to Export" to save this video</p>
+        </div>
+
+        <div class="help-section">
+            <h3>Saving Videos</h3>
+            <p>• Videos you want to save appear in the top left list<br>
+                • Click the "✕" to remove a video from the list<br>
+                • Click "Export Selected Videos" to download all saved videos</p>
+        </div>
+
+        <div style="margin-top: 25px; font-size: 0.85em; text-align: center; color: rgba(255, 255, 255, 0.6);">
+            <p>This visualization tool was originally created by <a href="https://thomick.github.io" target="_blank" rel="noopener noreferrer" style="color: #aaa; text-decoration: underline;">Thomas Michel</a>.</p>
+            <p style="margin-top: 10px; font-size: 1.1em; color: rgba(255, 255, 255, 0.8);">Enjoy exploring!</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const helpButton = document.getElementById('helpButton');
+            const helpPanel = document.getElementById('helpPanel');
+            const closeHelp = document.getElementById('closeHelp');
+
+            helpButton.addEventListener('click', function () {
+                helpPanel.style.display = 'block';
+            });
+
+            closeHelp.addEventListener('click', function () {
+                helpPanel.style.display = 'none';
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target !== helpPanel &&
+                    !helpPanel.contains(event.target) &&
+                    event.target !== helpButton &&
+                    !helpButton.contains(event.target)) {
+                    helpPanel.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
