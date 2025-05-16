@@ -2,7 +2,7 @@
 
 This repository contains the companion website for the paper "Curiosity-driven exploration of Flow Lenia universes: Bootstrapping open-ended evolution", presented at the ALife Conference 2025.
 
-Link to the webpage: [https://kcimoht.github.io/flowlenia-viz/](https://kcimoht.github.io/flowlenia-viz/)
+Link to the webpage: [http://developmentalsystems.org/Exploring-Flow-Lenia-Universes/](http://developmentalsystems.org/Exploring-Flow-Lenia-Universes/)
 
 ## Overview
 
@@ -21,8 +21,4 @@ Key aspects include:
 
 ## Visualization Tool
 
-An interactive visualization tool is available to explore Flow-Lenia's evolutionary dynamics. Users can examine parameter configurations, emergent behaviors, and evolutionary metrics discovered by IMGEP.
-
-Access the Visualization Tool: [visualization/index.html](visualization/index.html)
-
-The visualization tool will be free to use and modify once the paper is published.
+An interactive visualization tool is available on the website to explore Flow-Lenia's evolutionary dynamics. Users can examine parameter configurations, emergent behaviors, and evolutionary metrics discovered by IMGEP.
