@@ -226,23 +226,32 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1.8rem;
+            align-items: stretch;
         }
 
         .video-container {
             position: relative;
-            padding-bottom: 100%;
-            /* 1:1 aspect ratio (square) */
-            height: 0;
-            overflow: hidden;
+            background-color: rgba(58, 124, 165, 0.05);
             border-radius: 12px;
-            background-color: #eee;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .video-container:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 100%;
+            /* 1:1 aspect ratio (square) */
+            height: 0;
+            overflow: hidden;
         }
 
         .video-container iframe {
@@ -261,7 +270,18 @@
             width: 100%;
             height: 100%;
             border: none;
-            object-fit: contain;
+            object-fit: cover;
+        }
+
+        .video-description {
+            padding: 1rem;
+            line-height: 1.6;
+            border-top: 1px solid #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
         }
 
         .video-placeholder {
@@ -487,43 +507,134 @@
         </section>
 
         <section>
-            <h2>Video Demonstrations</h2>
-            <p>These videos showcase the some interesting evolutionary dynamics discovered through our IMGEP
-                exploration:</p>
+            <div class="card">
+                <h2>Video Demonstrations</h2>
+                <p>These videos showcase the some interesting dynamics discovered through our experiments:</p>
 
-            <div class="video-grid">
-                <div class="video-container">
-                    <video controls autoplay loop muted>
-                        <source src="visualization/673/videos/video_both.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="video-container">
-                    <video controls autoplay loop muted>
-                        <source src="visualization/1691/videos/video_both.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="video-container">
-                    <video controls autoplay loop muted>
-                        <source src="visualization/204/videos/video_both.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="video-container">
-                    <video controls autoplay loop muted>
-                        <source src="visualization/1204/videos/video_both.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="video-container">
-                    <video controls autoplay loop muted>
-                        <source src="visualization/2324/videos/video_both.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="video-container">
-                    <video controls autoplay loop muted>
-                        <source src="visualization/949/videos/video_both.mp4" type="video/mp4">
-                    </video>
+                <div class="video-grid">
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/evolution/still.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>A mostly static arrangement featuring large uniform chunks of matter. A set of mutations propagate near the end, results in a formation of membranes.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/evolution/large_pattern.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Different types of matter form into a large, complex pattern.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/evolution/colonies.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>A diverse array of patterns, some made up of tightly bound chunks of matter that resemble colonies.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/evolution/vibrating_matter.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Various kinds of vibrating masses, some containing a more static nuclei, swimming in a sea of simple mass chunks</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/evolution/chaotic.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Chaotic dynamics with rapid matter movement and constant mutations.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/eating/feeding_closeup.webm" type="video/webm">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Larger pattern "ingests" multiple smaller chunks of pattern, reminiscent of feeding.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/walls/186.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Cohesive pattern moving diagonally.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/walls/119.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Slightly dissipative pattern attracted to the corner.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/walls/1291.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Smaller patterns efficiently manouvering through narrow passages.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/walls/15.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Initial matter propagates into neighbouring rooms, afterwhich localized mutations result in speciation.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/walls/1783.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Movement behaviour of a large pattern changes multiple times after mutations. From directed motion, to stillness, to chaotic motion.</p>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video controls autoplay loop muted>
+                                <source src="videos/walls/1986.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="video-description">
+                            <p>Initial matter splits into two very fast moving patterns</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </section>
     </main>
 

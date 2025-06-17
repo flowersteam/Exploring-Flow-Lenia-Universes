@@ -1,0 +1,422 @@
+
+\documentclass{beamer}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{multimedia}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usetikzlibrary{positioning}
+
+\usetheme{Antibes}
+\usecolortheme{dolphin}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\title{Emergence, Control and Open-Ended Evolution in Cellular Automata}
+\author{\textbf{Thomas Michel}\\~\\ Research internship supervised by \textbf{Clément Moulin-Frier}, \\ \textbf{Gautier Hamon} and \textbf{Pierre-Yves Oudeyer}}
+\institute{École Normale Supérieure Paris-Saclay -- Master MVA\\
+Équipe Flowers, Centre Inria de l'Université de Bordeaux}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{The Challenge of Open-Ended Evolution}
+    \begin{columns}
+        \column{0.6\textwidth}
+        \begin{itemize}
+            \item Open-ended evolution: A fundamental characteristic of biological evolution
+            \item Continuous generation of novelty and increasing complexity
+            \item No predetermined endpoint
+            \item Challenging to replicate in artificial systems
+        \end{itemize}
+        \column{0.4\textwidth}
+        \centering
+        \begin{figure}
+            \centering
+            \begin{tikzpicture}
+                \node (img1) {\includegraphics[width=0.6\textwidth]{figures/gif_frames/frame_025.png}};
+                \node[below=0.1cm of img1] (arrow1) {\huge $\downarrow$};
+                \node[below=0.1cm of arrow1] (img2) {\includegraphics[width=0.6\textwidth]{figures/gif_frames/frame_200.png}};
+            \end{tikzpicture}
+            \label{fig:your-label}
+        \end{figure}
+    \end{columns}
+\end{frame}
+\begin{frame}{From Biology to Artificial Life}
+    \begin{itemize}
+        \item Natural evolution on Earth:
+              \begin{itemize}
+                  \item Billions of years of continuous innovation
+                  \item From single-celled organisms to complex life and intelligence
+              \end{itemize}\pause
+        \item Artificial Life (ALife) research aims to:
+              \begin{itemize}
+                  \item Recreate open-ended evolution in computational models
+                  \item Gain insights into fundamental principles of life and evolution
+                  \item Develop tools for evolutionary biology and astrobiology
+              \end{itemize}\pause
+        \item Cellular Automata: A powerful tool for ALife
+              \begin{itemize}
+                  \item Generate complex behaviors from simple rules
+                  \item Examples: Conway's Game of Life, Langton's self-replicating loops
+              \end{itemize}
+    \end{itemize}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.2\textwidth]{figures/gol.png}
+        \hspace{1cm}
+        \includegraphics[width=0.2\textwidth]{figures/loop.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Flow-Lenia}
+    \centering
+    {\small Flow-Lenia demo video presented at the Virtual Creature Contest during ALife2024 conference: \href{https://youtu.be/sSrHoe-iPiU}{\texttt{https://youtu.be/sSrHoe-iPiU}}}
+
+    \href{https://youtu.be/sSrHoe-iPiU}{\includegraphics[width=0.8\textwidth]{figures/cover.png}}
+
+
+    \begin{itemize}
+        \item Continuous cellular automaton with mass conservation
+        \item Enables multi-species simulations
+        \item Bridges cellular automata and particle-based systems
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Problem Statement}
+    \begin{itemize}
+        \item \textbf{Goal:} Bootstrap an open-ended evolutionary process in Flow-Lenia\\~\\\pause
+
+        \item \textbf{Challenge:} Vast parameter space, difficult to explore effectively. How to detect or quantify open-ended evolution in this environment?\\~\\\pause
+
+        \item \textbf{Proposed Approach:}
+              \begin{itemize}
+                  \item Define relevant metrics to describe evolutionary dynamics
+                  \item Use diversity search (IMGEP) to explore the space of Flow-Lenia's evolutionary trajectories
+              \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Key Components of Flow-Lenia}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{figures/schema.png}
+    \end{figure}
+    \begin{columns}
+        \column{0.6\textwidth}
+        \begin{itemize}
+            \item Activation of a cell interpreted as density of matter
+            \item Compute a potential map from the current state
+            \item Interpret the gradient of the potential map as a flow field
+            \item Move matter along the flow field using reintegration tracking
+            \item Update local parameter according to incoming matter
+        \end{itemize}
+        \column{0.4\textwidth}
+        \centering
+
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{figures/flow.png}
+        \end{figure}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Parameter Interactions and Mixing Rules in Flow-Lenia}
+    \begin{figure}
+        \centering
+        \begin{tabular}{@{}c@{\hspace{2mm}}c@{}}
+            \href{https://youtube.com/shorts/HlQfasTK3E4?feature=share}{%
+                \includegraphics[width=0.3\textwidth]{figures/genewise.png}
+            }                                    &
+            \href{https://youtu.be/E1xPoRLxFNk}{%
+                \includegraphics[width=0.3\textwidth]{figures/kinetic.png}
+            }                                                                                \\[-1ex]
+            \footnotesize (a) Genewise selection & \footnotesize (b) Kinetic-based selection \\
+            \href{https://youtube.com/shorts/QLInEmyw890?feature=share}{%
+                \includegraphics[width=0.3\textwidth]{figures/avg.png}
+            }                                    &
+            \href{https://youtu.be/zKMR06KPW_c}{%
+                \includegraphics[width=0.3\textwidth]{figures/nego.png}
+            }                                                                                \\[-1ex]
+            \footnotesize (c) Average mixing     & \footnotesize (d) Negotiation rule
+        \end{tabular}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Negotiation Mixing Rule}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{figures/nego_schema.png}
+    \end{figure}
+    \begin{itemize}
+        \item Complex interactions between different local parameters
+        \item Potential new behaviors: improved defense against external invasions, matter exchange without loss of identity, specialization for specific local environments
+        \item In practice we observed that the negotiation rule displayed generally more complex patterns and behaviors
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{From Flow-Lenia to Systematic Exploration}
+    \begin{itemize}
+        \item Flow-Lenia creates a vast, complex parameter space
+        \item Challenge: Efficiently discover conditions for open-ended evolution
+        \item Random sampling inefficient for high-dimensional spaces
+        \item Solution: Intrinsically Motivated Goal Exploration Processes (IMGEP)
+    \end{itemize}
+
+    \vspace{0.5em}
+    \pause
+    \textbf{Why IMGEP?}
+    \begin{enumerate}
+        \item Maximizes coverage of behavior space (diverse evolutionary dynamics)
+        \item Efficiently explores high-dimensional parameter spaces with non-linear interactions between parameters
+        \item Leverages previous explorations to guide future sampling
+    \end{enumerate}
+
+    \vspace{0.5em}
+
+    \textbf{Our Approach:} Explore diversity of evolutionary dynamics to bootstrap open-ended evolutionary processes in Flow-Lenia
+\end{frame}
+
+\begin{frame}{IMGEP: Systematic Exploration of Flow-Lenia}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[scale=1]
+
+                \begin{scope}[
+                        node distance=3.5cm,
+                        main node/.style={circle, draw, fill=white, minimum size=2.5cm, font=\small\bfseries, align=center, text width=2cm},
+                        arrow/.style={->, >=stealth, thick},
+                        number/.style={circle, fill=black, text=white, font=\tiny\bfseries, inner sep=1.5pt}
+                    ]
+
+                    % Define colors
+                    \definecolor{nodecolor1}{RGB}{255,153,153}
+                    \definecolor{nodecolor2}{RGB}{153,255,153}
+                    \definecolor{nodecolor3}{RGB}{153,153,255}
+                    \definecolor{nodecolor4}{RGB}{255,255,153}
+                    \definecolor{nodecolor5}{RGB}{255,153,255}
+
+                    % Nodes
+                    \node[main node, fill=nodecolor1] (A) at (90:3.5cm) {Choose\\New Goal};
+                    \node[main node, fill=nodecolor2] (B) at (18:3.5cm) {Find Closest\\Past Attempt};
+                    \node[main node, fill=nodecolor3] (C) at (306:3.5cm) {Mutate\\Parameters};
+                    \node[main node, fill=nodecolor4] (D) at (234:3.5cm) {Run\\Simulation};
+                    \node[main node, fill=nodecolor5] (E) at (162:3.5cm) {Save\\Reached Goal};
+
+                    % Arrows
+                    \draw[arrow] (A) to[bend left=15] (B);
+                    \draw[arrow] (B) to[bend left=15] (C);
+                    \draw[arrow] (C) to[bend left=15] (D);
+                    \draw[arrow] (D) to[bend left=15] (E);
+                    \draw[arrow] (E) to[bend left=15] (A);
+
+                    % Numbers
+                    \node[number] at (A.north west) {1};
+                    \node[number] at (B.north east) {2};
+                    \node[number] at (C.south east) {3};
+                    \node[number] at (D.south west) {4};
+                    \node[number] at (E.north west) {5};
+
+                    % Central text
+                    \node[text width=2cm, align=center, font=\bfseries] at (0,0) {IMGEP\\Main Loop};
+
+                \end{scope}
+            \end{tikzpicture}
+        }
+        \column{0.5\textwidth}
+        \begin{itemize}
+            \item Intrinsically Motivated Goal Exploration Processes
+            \item Efficient navigation of vast parameter spaces
+            \item Goals defined by evolutionary metrics
+            \item Iterative discovery process
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Quantifying Open-Ended Evolution}
+    \begin{itemize}
+        \item Non-neutral Evolutionary Activity
+              \begin{itemize}
+                  \item Captures sustained innovation without predefined fitness
+                  \item Focuses on adaptive changes in species abundance
+              \end{itemize}
+              \pause
+        \item Complexity via Video Compression
+              \begin{itemize}
+                  \item MP4 file size as proxy for visual complexity
+                  \item Captures both spatial and temporal patterns
+              \end{itemize}
+              \pause
+        \item Multi-scale Entropy
+              \begin{itemize}
+                  \item Quantifies matter distribution at various scales
+                  \item Insights into hierarchical organization
+              \end{itemize}
+              \pause
+        \item Movement via Wasserstein Distance
+              \begin{itemize}
+                  \item Measures matter redistribution between states
+                  \item Captures dynamic aspects independent of local parameters and update rules
+              \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Non-neutral Evolutionary Activity}
+    \begin{align*}
+        A           & = \sum_{i}\sum_{t=1}^{T}\Delta_i(t) \\[10pt]
+        \Delta_i(t) & =
+        \begin{cases}
+            (p_i(t) - p_i(t-1))^2 & \text{if } p_i(t) > p_i(t-1) \\
+            0                     & \text{otherwise}
+        \end{cases}
+    \end{align*}
+    where:
+    \begin{itemize}
+        \item $A$: Total evolutionary activity
+        \item $\Delta_i(t)$: Instantaneous activity of component $i$ at time $t$
+        \item $p_i(t)$: Proportion of simulated mass attributed to component $i$ at time $t$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Comparison of Mixing Rules}
+    \centering
+    \begin{figure}
+        \includegraphics[width=1.1\textwidth]{figures/ea_over_time.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{IMGEP Results}
+    \begin{columns}
+        \column{0.6\textwidth}
+        \centering
+        \begin{figure}
+            \includegraphics[width=1.1\textwidth]{figures/pair_imgep1.png}
+        \end{figure}
+        \column{0.4\textwidth}
+        \begin{itemize}
+            \item Outperformed random exploration
+            \item Discovered diverse dynamics
+            \item Rules with higher evolutionary activity
+            \item Lower entropy of the matter distribution
+            \item New combinations of metrics
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+% New slide: Detailed comparison of IMGEP vs. Random Search
+\begin{frame}{IMGEP vs. Random Search}
+    \begin{table}
+        \centering
+        \resizebox{\textwidth}{!}{%
+            \begin{tabular}{lcccccc}
+                \toprule
+                Algorithm     & Avg Pairwise Distance & Coverage      & std(EA)           & std(MP4)          & std(H7)           & std(H3)           \\
+                \midrule
+                IMGEP         & \textbf{7.88e-01}     & \textbf{1387} & \textbf{3.11e+03} & \textbf{7.76e+05} & \textbf{2.46e-01} & \textbf{5.43e-01} \\
+                Random Search & 4.41e-01              & 678           & 1.77e+03          & 6.55e+05          & 7.65e-02          & 3.68e-01          \\
+                \bottomrule
+            \end{tabular}
+        }
+    \end{table}
+    \vspace{0.5cm}
+    \begin{itemize}
+        \item IMGEP consistently outperforms Random Search across all metrics
+        \item Higher coverage and diversity in explored solution space
+        \item Greater standard deviation in key metrics indicates wider range of discovered behaviors
+    \end{itemize}
+\end{frame}
+
+% New slide: Evolution of metrics over time
+\begin{frame}{Evolution of Metrics Over Time}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{figures/inc_anal_short.png}
+        \caption{Evolution of exploration metrics for IMGEP (blue) and Random Search (orange) over time.}
+
+    \end{figure}
+\end{frame}
+
+% New slide: Interactive website showcase
+\begin{frame}{Interactive Exploration Tool}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/website.png}
+        \caption{\href{http://flowlenia.thomichel.fr}{http://flowlenia.thomichel.fr}}
+
+    \end{figure}
+    \begin{itemize}
+        \item Visualize and interact with all discovered simulations
+        \item Select specific dynamics based on metric values
+        \item Facilitates in-depth analysis of diverse behaviors
+    \end{itemize}
+\end{frame}
+
+% Updated slide: More diverse examples of discovered dynamics
+\begin{frame}{Diverse Dynamics Discovered by IMGEP}
+    \begin{figure}
+        \centering
+        \resizebox{\textwidth}{!}{%
+            \begin{tabular}{c@{ }c@{ }c@{ }c@{ }c}
+                \includegraphics[width=0.2\textwidth]{figures/4.png}    &
+                \includegraphics[width=0.2\textwidth]{figures/109.png}  &
+                \includegraphics[width=0.2\textwidth]{figures/1795.png} &
+                \includegraphics[width=0.2\textwidth]{figures/231.png}  &
+                \includegraphics[width=0.2\textwidth]{figures/1878.png}   \\[\dimexpr12pt-\normalbaselineskip]
+                \includegraphics[width=0.2\textwidth]{figures/1986.png} &
+                \includegraphics[width=0.2\textwidth]{figures/2021.png} &
+                \includegraphics[width=0.2\textwidth]{figures/2066.png} &
+                \includegraphics[width=0.2\textwidth]{figures/831.png}  &
+                \includegraphics[width=0.2\textwidth]{figures/2410.png}
+            \end{tabular}%
+        }
+        \caption{Wide range of patterns and behaviors discovered by IMGEP}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Future Directions}
+    \begin{itemize}
+        \item Investigate impact of initial conditions on evolutionary trajectories
+        \item Develop metrics to better capture temporal and spacial dynamics of evolution
+        \item Use IMGEP to automatically explore environmental conditions and their effects on evolutionary outcomes
+        \item Investigate relationship between visual interest and quantitative metrics
+        \item Extend simulations to study longer-term evolutionary dynamics
+        \item Compare IMGEP with other advanced search techniques (e.g., novelty search)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Key References}
+    \begin{thebibliography}{9}
+        \small
+        \setbeamertemplate{bibliography item}[text]
+        \bibitem{chan2018lenia} Chan, B. W. C. (2018). Lenia-biology of artificial life. arXiv preprint arXiv:1812.05433.
+        \bibitem{plantec2023flow} Plantec, E., et al. (2023). Flow-Lenia: Towards open-ended evolution in cellular automata through mass conservation and parameter localization. Artificial Life Conference Proceedings 35, 131.
+        \bibitem{forestier2022intrinsically} Forestier, S., et al. (2022). Intrinsically motivated goal exploration processes with automatic curriculum learning. Journal of Machine Learning Research, 23(152), 1-41.
+        \bibitem{reinke2020a} Reinke, C., Etcheverry, M., \& Oudeyer, P. Y. (2020). Intrinsically Motivated Discovery of Diverse Patterns in Self-Organizing Systems. arXiv preprint arXiv:1908.06663.
+        \bibitem{hamon2024discovering} Hamon, G., et al. (2024). Discovering Sensorimotor Agency in Cellular Automata using Diversity Search. arXiv preprint arXiv:2402.10236.
+    \end{thebibliography}
+\end{frame}
+\begin{frame}{Conclusion and Q\&A}
+    \centering
+    \Large{Thank you for your attention}
+    \vspace{1cm}
+
+    \normalsize
+    Questions? \\
+    \vspace{0.5cm}
+    Explore Flow-Lenia: \href{http://flowlenia.thomichel.fr}{\texttt{http://flowlenia.thomichel.fr}}
+\end{frame}
+
+\end{document}
+
